@@ -13,8 +13,10 @@ var cloudMaterial;
 var cloud;
 var velocityField;
 
-var textureLength = 128;
+var textureLength = 256;
 var particleCount = textureLength * textureLength;
+var gridSize = 320;
+var velocityMapWidth = gridSize / 10 ;
 
 document.onkeypress = function(e){
     //spacebar
@@ -34,14 +36,14 @@ var initialize = function(){
 
     //velocity texture map for simulation
     velocityField = new VelocityTextureMap({
-        width : 16,
+        width : velocityMapWidth,
         renderer : renderer
     });
 
     //simulator
     sim = new ParticleSimulator({
         width : textureLength,
-        bounds : 160,
+        bounds : gridSize,
         renderer:renderer,
         particleShaderId : "particleFragment"
     });
@@ -71,7 +73,7 @@ var initialize = function(){
     window.addEventListener( 'resize', onWindowResize, false );
 
     //GridHelper
-    scene.add(new THREE.GridHelper(80,10));
+    scene.add(new THREE.GridHelper(gridSize / 2,10));
 
     //windsocks
     //var makeWindSock = function(x,z){
@@ -128,6 +130,7 @@ var initialize = function(){
             //instead of something sane like an integer based index
             references[v * 2] = (Math.floor(v / textureLength)) / textureLength;
             references[(v * 2) + 1] = (v % textureLength) / textureLength;
+            //nevermind that's actually pretty smart?
 
             //whatever, copypasta'ed code
             values_size[ v ] = 1;
