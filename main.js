@@ -13,9 +13,7 @@ var cloudMaterial;
 var cloud;
 var velocityField;
 
-var st;
-
-var textureLength = 64;
+var textureLength = 128;
 var particleCount = textureLength * textureLength;
 
 document.onkeypress = function(e){
@@ -42,7 +40,7 @@ var initialize = function(){
 
     //simulator
     sim = new ParticleSimulator({
-        width : 64,
+        width : textureLength,
         bounds : 160,
         renderer:renderer,
         particleShaderId : "particleFragment"

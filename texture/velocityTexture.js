@@ -28,14 +28,12 @@ var VelocityTextureMap = function(options) {
             textureArray[ k + 3 ] = 1;
         }
 
-        var texture = new THREE.DataTexture( textureArray, self.width, self.width, THREE.RGBAFormat, THREE.FloatType );
+        texture = new THREE.DataTexture( textureArray, self.width, self.width, THREE.RGBAFormat, THREE.FloatType );
         texture.minFilter = THREE.NearestFilter;
         texture.magFilter = THREE.NearestFilter;
         texture.needsUpdate = true;
         texture.flipY = false;
-
-        self.texture = self.getRenderTarget(THREE.RGBAFormat,self.width);
-        self.initializeTexture(texture,self.texture);
+        self.texture = texture;
 
     })();
 
