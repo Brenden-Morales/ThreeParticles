@@ -21,7 +21,7 @@ var particleCount = textureLength * textureLength;
 document.onkeypress = function(e){
     //spacebar
     if(e.charCode === 32){
-        sim.renderTexture(0.5);
+        sim.renderTexture({delta : 0.5});
         cloudUniforms.texture.value = sim.activeTexture;
         render();
     }

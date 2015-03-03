@@ -80,7 +80,8 @@ var ParticleSimulator = function(options){
     };
 
     //render function
-    self.renderTexture = function(delta) {
+    self.renderTexture = function(data) {
+        //set the global mesh to our shader
         this.mesh.material = this.particleShader;
         if(this.ping){
             //we take from pong, render to ping
@@ -90,8 +91,14 @@ var ParticleSimulator = function(options){
             //take from ping, render to pong
             this.particleShader.uniforms.texture.value = this.pingTexture;
         }
-        this.particleShader.uniforms.time.value = new Date().getTime();
-        this.particleShader.uniforms.delta.value = delta;
+        //update all the uniforms
+        for(var prop in data){
+            if(data.hasOwnProperty(prop)){
+                if(this.particleShader.uniforms[prop] !== undefined){
+                    this.particleShader.uniforms[prop].value = data[prop];
+                }
+            }
+        }
         if(this.ping){
             this.ping = false;
             this.renderer.render(this.scene,this.camera,this.pingTexture);
@@ -106,8 +113,6 @@ var ParticleSimulator = function(options){
     };
 
     self.initialize = function(){
-        //add mesh to scene
-        //this.scene.add(this.mesh);
 
         //create the initial texture
         var initialParticleTexture = this.makeTexture();
