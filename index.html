@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html style="width:100%;height:100%;margin:0px;padding:0px;overflow:hidden">
+<script type="text/javascript" src="./three/three.js"></script>
+<script type="text/javascript" src="./three/OrbitControls.js"></script>
+<script type="text/javascript" src="./three/stats.min.js"></script>
+<script type="text/javascript" src="./simulate/shaderTexture.js"></script>
+<script type="text/javascript" src="./simulate/simulator.js"></script>
+<script type="text/javascript" src="./texture/velocityTexture.js"></script>
+<script type="text/javascript" src="./main.js"></script>
+
+<!-- pass through vertex shader -->
+<script id="passThroughVertex" type="x-shader/x-vertex">
+    void main()	{
+        gl_Position = vec4( position, 1.0 );
+    }
+</script>
+
+<!-- pass through fragment shader -->
+<script id="passThroughFragment" type="x-shader/x-fragment">
+    uniform vec2 resolution;
+    uniform float time;
+    uniform sampler2D texture;
+    void main()	{
+        vec2 uv = gl_FragCoord.xy / resolution.xy;
+        vec3 color = texture2D( texture, uv ).xyz;
+        gl_FragColor = vec4( color, 1.0 );
+    }
+</script>
+
+<script id="particleFragment" type="x-shader/x-fragment">
+
+    uniform vec2 resolution;
+    uniform float time;
+    uniform float delta;
+    uniform float bounds;
+    uniform sampler2D texture;
+    uniform sampler2D velocityField;
+    uniform float velocityBounds;
+
+    //pseudo random number generation
+    float rand(vec2 co){
+        return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+    }
+
+    void main()	{
+
+        vec2 uv = gl_FragCoord.xy / resolution.xy;
+        vec3 tmpPos = texture2D( texture, uv ).xyz;
+
+        //check bounds
+        float negBounds = bounds * -1.0;
+        if(tmpPos.x > bounds){
+            tmpPos.x = (rand(vec2(tmpPos.x,tmpPos.z)) * bounds * 2.0) - bounds;
+        }
+        if(tmpPos.x < negBounds){
+            tmpPos.x = (rand(vec2(tmpPos.x,tmpPos.z)) * bounds * 2.0) - bounds;
+        }
+        if(tmpPos.z > bounds){
+            tmpPos.z = (rand(vec2(tmpPos.x,tmpPos.z)) * bounds * 2.0) - bounds;
+        }
+        if(tmpPos.z < negBounds){
+            tmpPos.z = (rand(vec2(tmpPos.x,tmpPos.z)) * bounds * 2.0) - bounds;
+        }
+
+        //get velocity field
+        vec3 velocity = texture2D(velocityField,uv).xyz;
+
+        //go out from origin
+        vec3 nrmLzd = normalize(tmpPos);
+
+        gl_FragColor = vec4(tmpPos.x + (delta * nrmLzd.x),tmpPos.y,tmpPos.z + (delta * nrmLzd.z), 1.0 );
+        //gl_FragColor = vec4(tmpPos.x + 0.01 + velocity.x,tmpPos.y,tmpPos.z + 0.01 + velocity.z, 1.0 );
+
+    }
+
+</script>
+
+<script type="x-shader/x-vertex" id="cloudVertex">
+    attribute float size;
+    attribute vec2 reference;
+    attribute vec3 customColor;
+    uniform sampler2D texture;
+    varying vec3 vColor;
+    varying vec3 sampledPosition;
+    void main() {
+
+        //get coordinates for texture information
+        vec3 texInfo = texture2D( texture, reference).xyz;
+        //output for colouring
+        sampledPosition = texInfo;
+
+        vec3 modifiedPosition = vec3(texInfo.x, 0, texInfo.z);
+
+        vColor = customColor;
+        vec4 mvPosition = modelViewMatrix * vec4( modifiedPosition, 1.0 );
+        gl_PointSize = size * ( 300.0 / length( mvPosition.xyz ) );
+
+        gl_Position = projectionMatrix * mvPosition;
+    }
+</script>
+
+<script type="x-shader/x-fragment" id="cloudFragment">
+
+    uniform vec3 color;
+    varying vec3 vColor;
+    varying vec3 sampledPosition;
+
+    void main() {
+        gl_FragColor = vec4(sampledPosition,1.0);
+    }
+
+</script>
+
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body style="width:100%;height:100%;margin:0px;padding:0px;overflow:hidden" onload="initialize()">
+</body>
+</html>
