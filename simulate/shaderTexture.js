@@ -43,6 +43,7 @@ ShaderTexture.prototype.initializeTexture = function ( input, output ) {
     this.renderer.render( this.scene, this.camera, output );
 };
 
+//make a three.js render target for our textures that we want to render to
 ShaderTexture.prototype.getRenderTarget = function( type,width) {
     return new THREE.WebGLRenderTarget(width, width, {
         wrapS: THREE.RepeatWrapping,

@@ -35,7 +35,6 @@
     uniform float bounds;
     uniform sampler2D texture;
     uniform sampler2D velocityField;
-    uniform float velocityBounds;
 
     //pseudo random number generation
     float rand(vec2 co){
@@ -47,7 +46,7 @@
         vec2 uv = gl_FragCoord.xy / resolution.xy;
         vec3 tmpPos = texture2D( texture, uv ).xyz;
 
-        //check bounds
+        //check bounds, if we've gone out of bounds, pop back into bounds (pseudorandomly)
         float negBounds = bounds * -1.0;
         if(tmpPos.x > bounds){
             tmpPos.x = (rand(vec2(tmpPos.x,tmpPos.z)) * bounds * 2.0) - bounds;
@@ -65,12 +64,11 @@
         //get velocity field
         //get the particles position on the grid as a decimal fraction thing
         vec2 gridPos = vec2(((tmpPos.x + bounds) / (bounds * 2.0)), ((tmpPos.z + bounds) / (bounds * 2.0)));
+        //then we can just use that for sampling the velocity field texture!
         vec3 velocity = normalize(texture2D(velocityField,gridPos).xyz);
 
-        //go out from origin
-        vec3 nrmLzd = normalize(tmpPos);
-
-        //gl_FragColor = vec4(tmpPos.x + (delta * nrmLzd.x),tmpPos.y,tmpPos.z + (delta * nrmLzd.z), 1.0 );
+        //use the position we got from the previous texture, and the velocity we got from the velocity field
+        //to compute the new color of this pixel, which we'll use in the "particleCloud" as our position!
         gl_FragColor = vec4(tmpPos.x + velocity.x * 0.05,tmpPos.y,tmpPos.z + velocity.z * 0.05, 1.0 );
 
     }
@@ -83,13 +81,10 @@
     attribute vec3 customColor;
     uniform sampler2D texture;
     varying vec3 vColor;
-    varying vec3 sampledPosition;
     void main() {
 
         //get coordinates for texture information
         vec3 texInfo = texture2D( texture, reference).xyz;
-        //output for colouring
-        sampledPosition = texInfo;
 
         vec3 modifiedPosition = vec3(texInfo.x, 0, texInfo.z);
 

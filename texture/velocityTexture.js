@@ -7,6 +7,8 @@ var VelocityTextureMap = function(options) {
 
     self.width = options.width;
 
+    //all we're doing here is creating a static texture (not a RenderTarget)
+    //and using it for updating the paticles positions
     (function(){
         //make the typed array for the texture
         var textureArray = new Float32Array( self.width * self.width * 4 );
@@ -19,6 +21,7 @@ var VelocityTextureMap = function(options) {
         //loop through the data
         for ( var k = 0; k < textureArray.length; k += 4 ) {
             var x = Math.random() * 5 * negative();
+            //2d for now
             var y = 0;
             var z = Math.random() * 5 * negative();
             //rgba

@@ -30,8 +30,7 @@ var ParticleSimulator = function(options){
             bounds : {type : "f", value : self.bounds / 2},
             resolution: { type: "v2", value: new THREE.Vector2( self.width, self.width ) },
             texture: { type: "t", value: null },
-            velocityField : { type : "t", value : velocityField.texture},
-            velocityBounds : {type : "f", value : velocityField.width}
+            velocityField : { type : "t", value : velocityField.texture}
         },
         vertexShader: document.getElementById( 'passThroughVertex' ).textContent,
         fragmentShader: document.getElementById( self.particleShaderId ).textContent
@@ -109,7 +108,7 @@ var ParticleSimulator = function(options){
         this.pingTexture = this.getRenderTarget(THREE.RGBAFormat,this.width);
         this.pongTexture = this.pingTexture.clone();
 
-        //render them once for some reason?
+        //render them once for some reason? (why not?)
         this.initializeTexture(initialParticleTexture,this.pingTexture);
         this.initializeTexture(this.pingTexture,this.pongTexture);
     };
