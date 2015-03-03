@@ -36,7 +36,8 @@ var initialize = function(){
 
     //velocity texture map for simulation
     velocityField = new VelocityTextureMap({
-        width : 64
+        width : 64,
+        renderer : renderer
     });
 
     //simulator

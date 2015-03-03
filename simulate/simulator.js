@@ -67,18 +67,6 @@ var ParticleSimulator = function(options){
         return texture;
     };
 
-    self.getRenderTarget = function( type ) {
-        return new THREE.WebGLRenderTarget(this.width, this.width, {
-            wrapS: THREE.RepeatWrapping,
-            wrapT: THREE.RepeatWrapping,
-            minFilter: THREE.NearestFilter,
-            magFilter: THREE.NearestFilter,
-            format: type,
-            type: THREE.FloatType,
-            stencilBuffer: false
-        });
-    };
-
     //render function
     self.renderTexture = function(data) {
         //set the global mesh to our shader
@@ -118,7 +106,7 @@ var ParticleSimulator = function(options){
         var initialParticleTexture = this.makeTexture();
 
         //create the render targets
-        this.pingTexture = this.getRenderTarget(THREE.RGBAFormat);
+        this.pingTexture = this.getRenderTarget(THREE.RGBAFormat,this.width);
         this.pongTexture = this.pingTexture.clone();
 
         //render them once for some reason?

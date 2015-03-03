@@ -42,3 +42,15 @@ ShaderTexture.prototype.initializeTexture = function ( input, output ) {
     this.passThroughShader.uniforms.texture.value = input;
     this.renderer.render( this.scene, this.camera, output );
 };
+
+ShaderTexture.prototype.getRenderTarget = function( type,width) {
+    return new THREE.WebGLRenderTarget(width, width, {
+        wrapS: THREE.RepeatWrapping,
+        wrapT: THREE.RepeatWrapping,
+        minFilter: THREE.NearestFilter,
+        magFilter: THREE.NearestFilter,
+        format: type,
+        type: THREE.FloatType,
+        stencilBuffer: false
+    });
+};

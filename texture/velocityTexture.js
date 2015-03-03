@@ -3,15 +3,9 @@
  */
 var VelocityTextureMap = function(options) {
     var self = this instanceof VelocityTextureMap ? this : Object.create(VelocityTextureMap.prototype);
+    ShaderTexture.call(self,options);
 
     self.width = options.width;
-
-    //camera
-    self.camera = new THREE.Camera();
-    self.camera.position.z = 1;
-
-    //scene
-    self.scene = new THREE.Scene();
 
     (function(){
         //make the typed array for the texture
@@ -34,14 +28,18 @@ var VelocityTextureMap = function(options) {
             textureArray[ k + 3 ] = 1;
         }
 
-        var texture = new THREE.DataTexture( textureArray, Math.sqrt(this.particles), Math.sqrt(this.particles), THREE.RGBAFormat, THREE.FloatType );
+        var texture = new THREE.DataTexture( textureArray, self.width, self.width, THREE.RGBAFormat, THREE.FloatType );
         texture.minFilter = THREE.NearestFilter;
         texture.magFilter = THREE.NearestFilter;
         texture.needsUpdate = true;
         texture.flipY = false;
 
-        self.texture = texture;
+        self.texture = self.getRenderTarget(THREE.RGBAFormat,self.width);
+        self.initializeTexture(texture,self.texture);
+
     })();
 
     return self;
-}
+};
+
+VelocityTextureMap.prototype = Object.create(ShaderTexture.prototype);
