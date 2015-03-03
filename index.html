@@ -100,10 +100,9 @@
 
     uniform vec3 color;
     varying vec3 vColor;
-    varying vec3 sampledPosition;
 
     void main() {
-        gl_FragColor = vec4(sampledPosition,1.0);
+        gl_FragColor = vec4(vColor,1.0);
     }
 
 </script>

@@ -18,12 +18,17 @@ var particleCount = textureLength * textureLength;
 var gridSize = 320;
 var velocityMapWidth = gridSize / 10 ;
 
+var simulate = false;
+
 document.onkeypress = function(e){
     //spacebar
     if(e.charCode === 32){
-        sim.renderTexture({delta : 0.5});
-        cloudUniforms.texture.value = sim.activeTexture;
-        render();
+        if(simulate){
+            simulate = false;
+        }
+        else{
+            simulate = true;
+        }
     }
 }
 
@@ -162,6 +167,7 @@ var initialize = function(){
 
 
     render();
+    animate();
 }
 
 function onWindowResize() {
@@ -182,5 +188,11 @@ function render() {
 
 function animate() {
     requestAnimationFrame(animate);
+    if(simulate){
+        sim.renderTexture({delta : 0.5});
+        cloudUniforms.texture.value = sim.activeTexture;
+    }
+    renderer.render(scene,camera);
+    stats.update();
     controls.update();
 }
