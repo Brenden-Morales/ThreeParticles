@@ -63,13 +63,15 @@
         }
 
         //get velocity field
-        vec3 velocity = texture2D(velocityField,uv).xyz;
+        //get the particles position on the grid as a decimal fraction thing
+        vec2 gridPos = vec2(((tmpPos.x + bounds) / (bounds * 2.0)), ((tmpPos.z + bounds) / (bounds * 2.0)));
+        vec3 velocity = normalize(texture2D(velocityField,gridPos).xyz);
 
         //go out from origin
         vec3 nrmLzd = normalize(tmpPos);
 
-        gl_FragColor = vec4(tmpPos.x + (delta * nrmLzd.x),tmpPos.y,tmpPos.z + (delta * nrmLzd.z), 1.0 );
-        //gl_FragColor = vec4(tmpPos.x + 0.01 + velocity.x,tmpPos.y,tmpPos.z + 0.01 + velocity.z, 1.0 );
+        //gl_FragColor = vec4(tmpPos.x + (delta * nrmLzd.x),tmpPos.y,tmpPos.z + (delta * nrmLzd.z), 1.0 );
+        gl_FragColor = vec4(tmpPos.x + velocity.x * 0.05,tmpPos.y,tmpPos.z + velocity.z * 0.05, 1.0 );
 
     }
 

@@ -36,7 +36,7 @@ var initialize = function(){
 
     //velocity texture map for simulation
     velocityField = new VelocityTextureMap({
-        width : 64,
+        width : 16,
         renderer : renderer
     });
 
@@ -76,21 +76,21 @@ var initialize = function(){
     scene.add(new THREE.GridHelper(80,10));
 
     //windsocks
-    var makeWindSock = function(x,z){
-        var dir = new THREE.Vector3( 1, 0, 0 );
-        var origin = new THREE.Vector3( 0, 0, 0 );
-        var length = 3;
-        var hex = 0xffff00;
-        var arrowHelper = new THREE.ArrowHelper( dir, origin, length, hex );
-        scene.add( arrowHelper );
-        arrowHelper.position.x = x;
-        arrowHelper.position.z = z;
-    }
-    for(var x = -8; x < 8; x ++){
-        for(var z = -8; z < 8; z ++){
-            makeWindSock(x * 10, z * 10);
-        }
-    }
+    //var makeWindSock = function(x,z){
+    //    var dir = new THREE.Vector3( 1, 0, 0 );
+    //    var origin = new THREE.Vector3( 0, 0, 0 );
+    //    var length = 3;
+    //    var hex = 0xffff00;
+    //    var arrowHelper = new THREE.ArrowHelper( dir, origin, length, hex );
+    //    scene.add( arrowHelper );
+    //    arrowHelper.position.x = x;
+    //    arrowHelper.position.z = z;
+    //}
+    //for(var x = -8; x < 8; x ++){
+    //    for(var z = -8; z < 8; z ++){
+    //        makeWindSock(x * 10, z * 10);
+    //    }
+    //}
 
     var cloudAttributes = {
         size:        { type: 'f', value: null },
