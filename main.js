@@ -16,12 +16,13 @@ var velocityField;
 var textureLength = 256;
 var particleCount = textureLength * textureLength;
 var gridSize = 320;
-var velocityMapWidth = gridSize / 10 ;
+var spaceBetweenGridCells = 10;
+var velocityMapWidth = gridSize / spaceBetweenGridCells ;
 
 var simulate = false;
 
+//when the user hits the spacebar stop/start the simulation
 document.onkeypress = function(e){
-    //spacebar
     if(e.charCode === 32){
         if(simulate){
             simulate = false;
@@ -78,24 +79,7 @@ var initialize = function(){
     window.addEventListener( 'resize', onWindowResize, false );
 
     //GridHelper
-    scene.add(new THREE.GridHelper(gridSize / 2,10));
-
-    //windsocks
-    //var makeWindSock = function(x,z){
-    //    var dir = new THREE.Vector3( 1, 0, 0 );
-    //    var origin = new THREE.Vector3( 0, 0, 0 );
-    //    var length = 3;
-    //    var hex = 0xffff00;
-    //    var arrowHelper = new THREE.ArrowHelper( dir, origin, length, hex );
-    //    scene.add( arrowHelper );
-    //    arrowHelper.position.x = x;
-    //    arrowHelper.position.z = z;
-    //}
-    //for(var x = -8; x < 8; x ++){
-    //    for(var z = -8; z < 8; z ++){
-    //        makeWindSock(x * 10, z * 10);
-    //    }
-    //}
+    scene.add(new THREE.GridHelper(gridSize / 2, spaceBetweenGridCells));
 
     var cloudAttributes = {
         size:        { type: 'f', value: null },
@@ -141,9 +125,9 @@ var initialize = function(){
             values_size[ v ] = 1;
 
             //positions don't matter since we'll be taking those from the texture anyways
-            positions[ v * 3 ] = 0;
-            positions[ v * 3 + 1 ] = 0;
-            positions[ v * 3 + 2 ] = 0;
+            positions[ v * 3 ] = Math.random() * gridSize - gridSize / 2;
+            positions[ v * 3 + 1 ] = Math.random() * gridSize - gridSize / 2;
+            positions[ v * 3 + 2 ] = Math.random() * gridSize - gridSize / 2;
 
             //color, whatever
             color.setHSL( v / particleCount, 1.0, 0.5 );
@@ -157,6 +141,7 @@ var initialize = function(){
         geometry.addAttribute( 'customColor', new THREE.BufferAttribute( values_color, 3 ) );
         geometry.addAttribute( 'size', new THREE.BufferAttribute( values_size, 1 ) );
         geometry.addAttribute( 'reference', new THREE.BufferAttribute( references, 2 ) );
+        geometry.computeBoundingBox();
 
         cloud = new THREE.PointCloud( geometry, cloudMaterial );
 
