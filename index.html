@@ -97,8 +97,11 @@
     uniform sampler2D velocityField;
 
     float trim(float tot){
-        if(tot > 1.5){
-            return 1.5;
+        if(tot > 10.0){
+            return 10.0;
+        }
+        else if(tot < -10.0){
+            return -10.0;
         }
         else{
             return tot;
