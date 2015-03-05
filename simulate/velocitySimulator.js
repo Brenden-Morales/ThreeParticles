@@ -1,9 +1,9 @@
 /**
- * Created by brenden on 2/27/15.
+ * Created by brenden on 3/3/15.
  */
-var ParticleSimulator = function(options){
-    var self = this instanceof ParticleSimulator ? this : Object.create(ParticleSimulator.prototype);
-    //call ShaderTexture, because this is one of those
+var VelocitySimulator = function(options) {
+    var self = this instanceof VelocitySimulator ? this : Object.create(VelocitySimulator.prototype);
+//call ShaderTexture, because this is one of those
     ShaderTexture.call(self,options);
 
     //passed in variables
@@ -30,7 +30,8 @@ var ParticleSimulator = function(options){
             bounds : {type : "f", value : self.bounds / 2},
             resolution: { type: "v2", value: new THREE.Vector2( self.width, self.width ) },
             texture: { type: "t", value: null },
-            particleVelocities : { type : "t", value : null}
+            positionField : {type : "t", value : null},
+            velocityField : { type : "t", value : velocityField.texture}
         },
         vertexShader: document.getElementById( 'passThroughVertex' ).textContent,
         fragmentShader: document.getElementById( self.particleShaderId ).textContent
@@ -39,22 +40,17 @@ var ParticleSimulator = function(options){
 
     //make a rtt target
     self.makeTexture = function(){
-        //parse out options
-        var halfBounds = this.bounds / 2;
 
         //make the typed array for the texture
         var textureArray = new Float32Array( this.particles * 4 );
 
         //loop through the data
         for ( var k = 0; k < textureArray.length; k += 4 ) {
-            var x = Math.random() * this.bounds - halfBounds;
-            var y = Math.random() * this.bounds - halfBounds;
-            var z = Math.random() * this.bounds - halfBounds
             //rgba
-            textureArray[ k + 0 ] = x;
-            textureArray[ k + 1 ] = y;
-            textureArray[ k + 2 ] = z;
-            textureArray[ k + 3 ] = 1;
+            textureArray[ k + 0 ] = 0;
+            textureArray[ k + 1 ] = 0;
+            textureArray[ k + 2 ] = 0;
+            textureArray[ k + 3 ] = 0;
         }
 
         var texture = new THREE.DataTexture( textureArray, Math.sqrt(this.particles), Math.sqrt(this.particles), THREE.RGBAFormat, THREE.FloatType );
@@ -70,6 +66,7 @@ var ParticleSimulator = function(options){
     self.renderTexture = function(data) {
         //set the global mesh to our shader
         this.mesh.material = this.particleShader;
+        //decide if we're pinging or ponging
         if(this.ping){
             //we take from pong, render to ping
             this.particleShader.uniforms.texture.value = this.pongTexture;
@@ -116,4 +113,4 @@ var ParticleSimulator = function(options){
     return self;
 };
 
-ParticleSimulator.prototype = Object.create(ShaderTexture.prototype);
+VelocitySimulator.prototype = Object.create(ShaderTexture.prototype);

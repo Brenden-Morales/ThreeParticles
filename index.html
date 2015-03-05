@@ -6,6 +6,7 @@
 <script type="text/javascript" src="./simulate/shaderTexture.js"></script>
 <script type="text/javascript" src="./simulate/simulator.js"></script>
 <script type="text/javascript" src="./texture/velocityTexture.js"></script>
+<script type="text/javascript" src="./simulate/velocitySimulator.js"></script>
 <script type="text/javascript" src="./main.js"></script>
 
 <!-- pass through vertex shader -->
@@ -19,6 +20,7 @@
 <script id="passThroughFragment" type="x-shader/x-fragment">
     uniform vec2 resolution;
     uniform float time;
+    //input texture from the previous run of this shader on the ping / pong
     uniform sampler2D texture;
     void main()	{
         vec2 uv = gl_FragCoord.xy / resolution.xy;
@@ -33,8 +35,10 @@
     uniform float time;
     uniform float delta;
     uniform float bounds;
+    //input texture from the previous run of this shader on the ping / pong
     uniform sampler2D texture;
-    uniform sampler2D velocityField;
+    //velocity per-particle texture
+    uniform sampler2D particleVelocities;
 
     //pseudo random number generation
     float rand(vec2 co){
@@ -46,30 +50,86 @@
         vec2 uv = gl_FragCoord.xy / resolution.xy;
         vec3 tmpPos = texture2D( texture, uv ).xyz;
 
+        //get velocity of the particle
+        vec3 velocity = texture2D(particleVelocities,uv).xyz * 0.5;
+
+        //reset velocity flag
+        float velocityReset = 0.0;
+
         //check bounds, if we've gone out of bounds, pop back into bounds (pseudorandomly)
         float negBounds = bounds * -1.0;
         if(tmpPos.x > bounds){
             tmpPos.x = (rand(vec2(tmpPos.x,tmpPos.z)) * bounds * 2.0) - bounds;
+            velocityReset = 1.0;
         }
         if(tmpPos.x < negBounds){
             tmpPos.x = (rand(vec2(tmpPos.x,tmpPos.z)) * bounds * 2.0) - bounds;
+            velocityReset = 1.0;
         }
         if(tmpPos.z > bounds){
             tmpPos.z = (rand(vec2(tmpPos.x,tmpPos.z)) * bounds * 2.0) - bounds;
+            velocityReset = 1.0;
         }
         if(tmpPos.z < negBounds){
             tmpPos.z = (rand(vec2(tmpPos.x,tmpPos.z)) * bounds * 2.0) - bounds;
+            velocityReset = 1.0;
         }
-
-        //get velocity field
-        //get the particles position on the grid as a decimal fraction thing
-        vec2 gridPos = vec2(((tmpPos.x + bounds) / (bounds * 2.0)), ((tmpPos.z + bounds) / (bounds * 2.0)));
-        //then we can just use that for sampling the velocity field texture!
-        vec3 velocity = normalize(texture2D(velocityField,gridPos).xyz);
 
         //use the position we got from the previous texture, and the velocity we got from the velocity field
         //to compute the new color of this pixel, which we'll use in the "particleCloud" as our position!
-        gl_FragColor = vec4(tmpPos.x + velocity.x * 0.05,tmpPos.y,tmpPos.z + velocity.z * 0.05, 1.0 );
+        gl_FragColor = vec4(tmpPos.x + velocity.x * 0.05,tmpPos.y,tmpPos.z + velocity.z * 0.05, velocityReset );
+
+    }
+
+</script>
+
+<script id="velocityFragment" type="x-shader/x-fragment">
+
+    uniform vec2 resolution;
+    uniform float time;
+    uniform float delta;
+    uniform float bounds;
+    //input texture from the previous run of this shader on the ping / pong (previous particle velocity)
+    uniform sampler2D texture;
+    //texture of particle positions
+    uniform sampler2D positionField;
+    //texture for velocity field ... velocities?
+    uniform sampler2D velocityField;
+
+    float trim(float tot){
+        if(tot > 1.5){
+            return 1.5;
+        }
+        else{
+            return tot;
+        }
+
+    }
+
+    void main()	{
+
+        //get the position of this particle based on the position texture
+        vec2 uv = gl_FragCoord.xy / resolution.xy;
+        vec4 tmpPos = texture2D( positionField, uv );
+        float velocityReset = tmpPos.w;
+
+        //get the particles position on the grid as a decimal fraction thing
+        vec2 gridPos = vec2(((tmpPos.x + bounds) / (bounds * 2.0)), ((tmpPos.z + bounds) / (bounds * 2.0)));
+
+        //get velocity field
+        vec3 cellVelocity = texture2D(velocityField,gridPos).xyz;
+
+        //now we look at the existing velocity for this specific particle
+        vec3 existingVelocity = texture2D( texture,uv).xyz;
+
+        //add the cell velocity to the existing velocity (for now)
+        vec3 addedVelocity = vec3(trim(existingVelocity.x + cellVelocity.x),0.0,trim(existingVelocity.z + cellVelocity.z));
+
+        //write that out to our velocity texture
+        gl_FragColor = vec4(addedVelocity,1.0 );
+        if(velocityReset > 0.0){
+            gl_FragColor = vec4(0.0,0.0,0.0,0.0);
+        }
 
     }
 

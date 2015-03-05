@@ -20,10 +20,10 @@ var VelocityTextureMap = function(options) {
 
         //loop through the data
         for ( var k = 0; k < textureArray.length; k += 4 ) {
-            var x = Math.random() * 5 * negative();
+            var x = Math.random() * 1 * negative();
             //2d for now
             var y = 0;
-            var z = Math.random() * 5 * negative();
+            var z = Math.random() * 1 * negative();
             //rgba
             textureArray[ k + 0 ] = x;
             textureArray[ k + 1 ] = y;
@@ -36,7 +36,11 @@ var VelocityTextureMap = function(options) {
         texture.magFilter = THREE.NearestFilter;
         texture.needsUpdate = true;
         texture.flipY = false;
-        self.texture = texture;
+
+        var pingTexture = self.getRenderTarget(THREE.RGBAFormat,self.width);
+        self.initializeTexture(texture,pingTexture);
+
+        self.texture = pingTexture;
 
     })();
 

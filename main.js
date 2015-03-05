@@ -1,6 +1,3 @@
-/**
- * Created by brenden on 2/26/15.
- */
 //necessary global variables
 var camera;
 var controls;
@@ -12,6 +9,7 @@ var cloudUniforms;
 var cloudMaterial;
 var cloud;
 var velocityField;
+var velocitySim;
 
 var textureLength = 256;
 var particleCount = textureLength * textureLength;
@@ -53,8 +51,27 @@ var initialize = function(){
         renderer:renderer,
         particleShaderId : "particleFragment"
     });
-
     sim.initialize();
+
+    velocitySim = new VelocitySimulator({
+        width : textureLength,
+        bounds : gridSize,
+        renderer:renderer,
+        particleShaderId : "velocityFragment"
+    });
+    velocitySim.initialize();
+    velocitySim.renderTexture({
+        delta : 0.5,
+        positionField : sim.activeTexture
+    });
+
+    //so it looks nice at initialization
+    sim.renderTexture({
+        delta : 0.5,
+        particleVelocities : velocitySim.activeTexture
+    });
+
+
 
     //camera
     camera = new THREE.PerspectiveCamera(60,window.innerWidth / window.innerHeight,1,1000);
@@ -174,7 +191,14 @@ function render() {
 function animate() {
     requestAnimationFrame(animate);
     if(simulate){
-        sim.renderTexture({delta : 0.5});
+        velocitySim.renderTexture({
+            delta : 0.5,
+            positionField : sim.activeTexture
+        });
+        sim.renderTexture({
+            delta : 0.5,
+            particleVelocities : velocitySim.activeTexture
+        });
         cloudUniforms.texture.value = sim.activeTexture;
     }
     renderer.render(scene,camera);
