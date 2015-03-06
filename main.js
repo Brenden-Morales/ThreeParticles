@@ -11,10 +11,10 @@ var cloud;
 var velocityField;
 var velocitySim;
 
-var textureLength = 256;
+var textureLength = 512;
 var particleCount = textureLength * textureLength;
 var gridSize = 320;
-var spaceBetweenGridCells = 10;
+var spaceBetweenGridCells = 5;
 var velocityMapWidth = gridSize / spaceBetweenGridCells ;
 
 var simulate = false;
@@ -82,8 +82,6 @@ var initialize = function(){
     controls = new THREE.OrbitControls( camera );
     controls.damping = 0.2;
 
-    controls.addEventListener( 'change', render );
-
     //scene
     scene = new THREE.Scene();
 
@@ -139,7 +137,7 @@ var initialize = function(){
             //nevermind that's actually pretty smart?
 
             //whatever, copypasta'ed code
-            values_size[ v ] = 1;
+            values_size[ v ] = 0.3;
 
             //positions don't matter since we'll be taking those from the texture anyways
             positions[ v * 3 ] = Math.random() * gridSize - gridSize / 2;
