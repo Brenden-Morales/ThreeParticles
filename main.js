@@ -11,6 +11,14 @@ var cloud;
 var velocityField;
 var velocitySim;
 
+var mouse = new THREE.Vector3();
+document.onmousemove = function(event) {
+    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    mouse.z = 0.5;
+};
+var intersectPlane = new THREE.Plane(new THREE.Vector3(0,1,0));
+
 var textureLength = 512;
 var particleCount = textureLength * textureLength;
 var gridSize = 320;
@@ -18,6 +26,8 @@ var spaceBetweenGridCells = 5;
 var velocityMapWidth = gridSize / spaceBetweenGridCells ;
 
 var simulate = false;
+
+
 
 //when the user hits the spacebar stop/start the simulation
 document.onkeypress = function(e){
@@ -28,6 +38,12 @@ document.onkeypress = function(e){
         else{
             simulate = true;
         }
+    }
+    else if (e.charCode === 101){
+        mouse.unproject(camera);
+        var ray = new THREE.Ray( camera.position, mouse.sub( camera.position ).normalize() );
+        var intersect = ray.intersectPlane(intersectPlane);
+        console.log(intersect);
     }
 }
 
