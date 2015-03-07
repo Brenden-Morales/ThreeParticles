@@ -69,7 +69,6 @@ var initialize = function(){
         renderer : renderer,
         particleShaderId : "particleFragment",
         uniforms: {
-            time: { type: "f", value: 1.0 },
             delta: { type: "f", value: 0.0 },
             bounds : {type : "f", value : gridSize / 2},
             resolution: { type: "v2", value: new THREE.Vector2( textureLength, textureLength ) },
@@ -85,7 +84,6 @@ var initialize = function(){
         renderer:renderer,
         particleShaderId : "velocityFragment",
         uniforms: {
-            time: { type: "f", value: 1.0 },
             delta: { type: "f", value: 0.0 },
             bounds : {type : "f", value : gridSize / 2},
             resolution: { type: "v2", value: new THREE.Vector2( textureLength, textureLength ) },

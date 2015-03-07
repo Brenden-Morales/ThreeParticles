@@ -20,7 +20,6 @@
 <!-- pass through fragment shader -->
 <script id="passThroughFragment" type="x-shader/x-fragment">
     uniform vec2 resolution;
-    uniform float time;
     //input texture from the previous run of this shader on the ping / pong
     uniform sampler2D texture;
     void main()	{
@@ -33,7 +32,6 @@
 <script id="particleFragment" type="x-shader/x-fragment">
 
     uniform vec2 resolution;
-    uniform float time;
     uniform float delta;
     uniform float bounds;
     //input texture from the previous run of this shader on the ping / pong
@@ -87,7 +85,6 @@
 <script id="velocityFragment" type="x-shader/x-fragment">
 
     uniform vec2 resolution;
-    uniform float time;
     uniform float delta;
     uniform float bounds;
     //input texture from the previous run of this shader on the ping / pong (previous particle velocity)
