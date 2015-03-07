@@ -11,6 +11,8 @@ var cloud;
 var velocityField;
 var velocitySim;
 
+var previousTime;
+
 var mouse = new THREE.Vector3();
 document.onmousemove = function(event) {
     mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
@@ -110,7 +112,7 @@ var initialize = function(){
     window.addEventListener( 'resize', onWindowResize, false );
 
     //GridHelper
-    scene.add(new THREE.GridHelper(gridSize / 2, spaceBetweenGridCells));
+    //scene.add(new THREE.GridHelper(gridSize / 2, spaceBetweenGridCells));
 
     var cloudAttributes = {
         size:        { type: 'f', value: null },
@@ -182,6 +184,7 @@ var initialize = function(){
     makeParticles();
 
 
+    previousTime = window.performance.now();
     render();
     animate();
 }
@@ -203,14 +206,18 @@ function render() {
 }
 
 function animate() {
+    var now = window.performance.now();
+    var delta = previousTime - now;
+    var previousTime = now;
+
     requestAnimationFrame(animate);
     if(simulate){
         velocitySim.renderTexture({
-            delta : 0.5,
+            delta : delta,
             positionField : sim.activeTexture
         });
         sim.renderTexture({
-            delta : 0.5,
+            delta : delta,
             particleVelocities : velocitySim.activeTexture
         });
         cloudUniforms.texture.value = sim.activeTexture;
