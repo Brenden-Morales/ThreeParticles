@@ -87,6 +87,7 @@
     uniform vec2 resolution;
     uniform float delta;
     uniform float bounds;
+    uniform vec3 mouse;
     //input texture from the previous run of this shader on the ping / pong (previous particle velocity)
     uniform sampler2D texture;
     //texture of particle positions
@@ -104,7 +105,6 @@
         else{
             return tot;
         }
-
     }
 
     void main()	{
@@ -113,6 +113,16 @@
         vec2 uv = gl_FragCoord.xy / resolution.xy;
         vec4 tmpPos = texture2D( positionField, uv );
         float velocityReset = tmpPos.w;
+
+        //mouse distance checking
+        bool mouseBounds = false;
+        float distFromMouse = 0.0;
+        if(mouse.y != -1.0){
+            distFromMouse = distance(vec2(tmpPos.x,tmpPos.z),vec2(mouse.x,mouse.z));
+            if(distFromMouse <= 10.0){
+                mouseBounds = true;
+            }
+        }
 
         //get the particles position on the grid as a decimal fraction thing
         vec2 gridPos = vec2(((tmpPos.x + bounds) / (bounds * 2.0)), ((tmpPos.z + bounds) / (bounds * 2.0)));
@@ -127,9 +137,15 @@
         vec3 addedVelocity = vec3(trim(existingVelocity.x + cellVelocity.x),0.0,trim(existingVelocity.z + cellVelocity.z));
 
         //write that out to our velocity texture
-        gl_FragColor = vec4(addedVelocity,1.0 );
+        gl_FragColor = vec4(addedVelocity,0.0 );
         if(velocityReset > 0.0){
             gl_FragColor = vec4(0.0,0.0,0.0,0.0);
+        }
+        if(mouseBounds){
+            vec2 partPos = vec2(tmpPos.x,tmpPos.z);
+            vec2 mousePos = vec2(mouse.x,mouse.z);
+            vec2 delta = partPos - mousePos;
+            gl_FragColor = vec4(delta.x * 10.0,0.0,delta.y * 10.0,0.0);
         }
 
     }

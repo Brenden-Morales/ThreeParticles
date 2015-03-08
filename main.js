@@ -19,6 +19,7 @@ document.onmousemove = function(event) {
     mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
     mouse.z = 0.5;
 };
+var mouseIntersect = new THREE.Vector3(0,-1,0);
 var intersectPlane = new THREE.Plane(new THREE.Vector3(0,1,0));
 
 var textureLength = 512;
@@ -42,10 +43,17 @@ document.onkeypress = function(e){
         }
     }
     else if (e.charCode === 101){
-        mouse.unproject(camera);
-        var ray = new THREE.Ray( camera.position, mouse.sub( camera.position ).normalize() );
-        var intersect = ray.intersectPlane(intersectPlane);
-        console.log(intersect);
+        var tempMouse = new THREE.Vector3(mouse.x,mouse.y,mouse.z);
+        tempMouse.unproject(camera);
+        console.log(tempMouse);
+        var ray = new THREE.Ray( camera.position, tempMouse.sub( camera.position ).normalize() );
+        console.log(ray);
+        var sect = ray.intersectPlane(intersectPlane);
+        console.log(sect);
+        if(sect !== null){
+            mouseIntersect = sect
+        }
+        console.log(mouseIntersect);
     }
 }
 
@@ -86,6 +94,7 @@ var initialize = function(){
         uniforms: {
             delta: { type: "f", value: 0.0 },
             bounds : {type : "f", value : gridSize / 2},
+            mouse : {type : "v3", value :mouseIntersect},
             resolution: { type: "v2", value: new THREE.Vector2( textureLength, textureLength ) },
             texture: { type: "t", value: null },
             positionField : {type : "t", value : null},
@@ -225,9 +234,9 @@ function animate() {
     var delta = previousTime - now;
     var previousTime = now;
 
-    requestAnimationFrame(animate);
     if(simulate){
         velocitySim.renderTexture({
+            mouse : mouseIntersect,
             delta : delta,
             positionField : sim.activeTexture
         });
@@ -236,8 +245,11 @@ function animate() {
             particleVelocities : velocitySim.activeTexture
         });
         cloudUniforms.texture.value = sim.activeTexture;
+        mouseIntersect.y = -1;
     }
     renderer.render(scene,camera);
     stats.update();
     controls.update();
+
+    requestAnimationFrame(animate);
 }
